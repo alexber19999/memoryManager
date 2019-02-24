@@ -165,7 +165,7 @@ void replacementFree(void* address){
 	Node* node = findNode(address);
 	if(node){
 		if(node -> next -> type == HOLE){
-			mergNodes(node, node -> next);
+			mergeNodes(node, node -> next);
 		}
 		if(node -> prev -> type == HOLE){
 			mergeNodes(node -> prev, node);
