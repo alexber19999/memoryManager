@@ -1,4 +1,7 @@
+#include <stdlib.h>
+#include <string.h>
 #include "heap.h"
+
 
 typedef enum BlockType {
 	HOLE = 0,
@@ -6,11 +9,11 @@ typedef enum BlockType {
 } BlockType;
 
 typedef struct Node {
-	BloctType type;
+	BlockType type;
 	size_t size;
 	char* startAddress;
-	struct Node* prev = NULL;
-	struct Node* next = NULL;
+	struct Node* prev;
+	struct Node* next;
 } Node;
 
 #define myHeap 1000
@@ -20,7 +23,7 @@ Node* head = NULL;
 Node* makeNewNode(size_t size, char* startAddress, BlockType type){
 	Node* node = (Node*) malloc(sizeof(Node));
 	node -> size = size;
-	node -> startAddress = (char*) malloc(strlen(label) + 1);
+	node -> startAddress = (char*) malloc(strlen(startAddress) + 1);
 	strcpy(node -> startAddress, startAddress);
 	node -> type = type;
 	return node;
@@ -60,7 +63,7 @@ void insertInBetweenTwoNodes(Node* newNode, Node* previous, Node* next){
 
 
 Node* insert(size_t size){
-	Node* space = spaceFound(size, head);
+	Node* space = spaceFound(size);
 	if(!space){
 		return NULL;
 	}
@@ -120,13 +123,12 @@ Node* insert(size_t size){
 	*/
 }
 
-
 void* replacementAlloc(size_t size){
 	if(!heap){
 		initHeap();
 	}
 
-	Node* newNode = insert(head, size);
+	Node* newNode = insert(size);
 
 	if(!newNode){
 		return NULL;
