@@ -30,23 +30,24 @@ Node* makeNewNode(size_t size, char* startAddress, BlockType type){
 	node -> type = type;
 	return node;
 }
+void reInitHead(Node* node){
+	head -> next = node;
+	head -> size = 0;
+	head -> prev = NULL;
+	//head -> startAddress = heap;
+}
 
 void initHeap(){
 	heap = (char*) malloc(myHeap);
 	head = makeNewNode(myHeap, heap, HOLE);
 }
 
-void printNodeInfo(Node* node){
-	printf("%zu\n", node -> size);
-		printf("%d\n", node -> type);
-		printf("%p\n", node -> startAddress);
-		printf("\n\n");
-}
 Node* spaceFound(size_t size){
 	
 	Node* nextNode = head;
 	while(nextNode){
 		if((size <= nextNode -> size) && (nextNode -> type == HOLE)){
+
 			return nextNode;
 		}
 
@@ -67,14 +68,11 @@ void insertInBetweenTwoNodes(Node* newNode, Node* previous, Node* next){
 	next -> prev = newNode;
 }
 
-void reInitHead(Node* node){
-	head -> next = node;
-	head -> size = 0;
-	head -> prev = NULL;
-	head -> startAddress = heap;
-}
+
 Node* insert(size_t size){
+
 	Node* space = spaceFound(size);
+
 	if(!space){
 		return NULL;
 	}
@@ -84,17 +82,17 @@ Node* insert(size_t size){
 		return space;
 	}
 
-	if((space -> size == head -> size) && (head -> type == HOLE)){
+	if((space -> size == space -> size) && (space -> type == HOLE)){
 		//add stuff for the first time to the heap
 		Node* newNode = makeNewNode(size, heap, ALLOC);
 		Node* newSpace = makeNewNode(head -> size, newNode -> startAddress + size, HOLE);
 
 		insertInBetweenTwoNodes(newNode, head, newSpace);
-		reInitHead(newNode);
+		//reInitHead(newNode);
 		newSpace -> next = NULL;
+		head -> startAddress = heap;
 		
 	} else {
-
 		//add stuff in between 2 nodes
 		Node* newNode = makeNewNode(size, space -> startAddress, ALLOC);
 		insertInBetweenTwoNodes(newNode, space -> prev, space);
@@ -112,7 +110,9 @@ Node* insert(size_t size){
 				if the spaceFound is equal to the size, then change the spaceFound
 				-> type to ALLOC
 				insert in between 2 nodes, the free space and allocated space
+
 			
+
 		insert into the front of the heap:
 			make a new node
 			new node -> size = size
@@ -124,6 +124,7 @@ Node* insert(size_t size){
 			free space -> prev is new node
 			free space start address is free space -> startAddress + new node -> size
 			free space -> size is free space -> size - new node -> size
+
 		insert in between 2 nodes:
 			make a new node
 			new node -> size = size
@@ -147,13 +148,14 @@ void printNodeList(){
 	}
 }
 void* replacementAlloc(size_t size){
+
 	if(!heap){
 		initHeap();
 	}
 
 	Node* newNode = insert(size);
-
 	if(!newNode){
+
 		return NULL;
 	}
 	printNodeList();
@@ -165,9 +167,7 @@ void* replacementAlloc(size_t size){
 Node* findNode(void* address){
 	Node* node = head;
 	int notFound = 1;
-	printf("AddressNeeded: %p\n", address);
 	while(notFound && node){
-	printf("NodeAddr: %p\n", node -> startAddress);
 		if(node -> startAddress == address){
 			notFound = 0;
 		} 
@@ -181,19 +181,23 @@ Node* findNode(void* address){
 
 void mergeNodes(Node* nodeLeft, Node* nodeRight){
 	nodeLeft -> size += nodeRight -> size;
+
 	nodeRight -> next -> prev = nodeLeft;
+
 	nodeLeft -> next = nodeRight -> next;
+
 	free(nodeRight);
 }
 
 
 void replacementFree(void* address){
-	printf("HERE\n");
+
 	Node* node = findNode(address);
-	
-	if(node){
-		printNodeInfo(node);
-		if(node -> next){
+
+	if(node == NULL) exit(-1);
+
+	//if(node -> size > 0){
+		if(node -> next){	
 			if(node -> next -> type == HOLE){
 				mergeNodes(node, node -> next);
 			}
@@ -206,13 +210,41 @@ void replacementFree(void* address){
 			}
 		}
 
+printf("Hello\n");
 		if(node){
 			free(node);
-	printNodeList();
 		}
-	} else {
+/*	} else {
 		printf("INSIDE ELSE\n");
-	printNodeList();
+		printf("NODE");
 		exit(EXIT_FAILURE);
-	}
+	}*/
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

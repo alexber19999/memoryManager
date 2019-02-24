@@ -19,5 +19,6 @@ int main(int argc, char* argv[]){
 	char* ptr2 = myMalloc(400);
 	char* ptr3 = myMalloc(300);
 	char* ptr4 = myMalloc(100);
-	free(ptr4);
+
+	free(ptr1);
 }
