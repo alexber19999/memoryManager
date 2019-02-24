@@ -151,9 +151,32 @@ Node* findNode(void* address){
 }
 
 
+void mergeNodes(Node* nodeLeft, Node* nodeRight){
+	nodeLeft -> size += nodeRight -> size;
+	nodeRight -> next -> prev = nodeLeft;
+	nodeLeft -> next = nodeRight -> next;
+	free(nodeRight);
+	
+
+}
+
+
 void replacementFree(void* address){
 	Node* node = findNode(address);
+	if(node){
+		if(node -> next -> type == HOLE){
+			mergNodes(node, node -> next);
+		}
+		if(node -> prev -> type == HOLE){
+			mergeNodes(node -> prev, node);
+		}
 	
+		if(node){
+			free(node);
+		}
+	} else {
+		//crash
+	}
 }
 
 
