@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "heap.h"
+
 
 
 typedef enum BlockType {
@@ -35,12 +37,10 @@ void initHeap(){
 }
 
 Node* spaceFound(size_t size){
-
+	
 	Node* nextNode = head;
-
 	while(nextNode){
-
-		if(size >= nextNode -> size){
+		if((size <= nextNode -> size) && (nextNode -> type == HOLE)){
 			return nextNode;
 		}
 
@@ -61,7 +61,12 @@ void insertInBetweenTwoNodes(Node* newNode, Node* previous, Node* next){
 	next -> prev = newNode;
 }
 
-
+void reInitHead(Node* node){
+	head -> next = node;
+	head -> size = 0;
+	head -> prev = NULL;
+	head -> startAddress = heap;
+}
 Node* insert(size_t size){
 	Node* space = spaceFound(size);
 	if(!space){
@@ -76,12 +81,17 @@ Node* insert(size_t size){
 	if((space -> size == head -> size) && (head -> type == HOLE)){
 		//add stuff for the first time to the heap
 		Node* newNode = makeNewNode(size, heap, ALLOC);
-		insertInBetweenTwoNodes(newNode, head, space);
+		Node* newSpace = makeNewNode(head -> size, newNode -> startAddress + size, HOLE);
+
+		insertInBetweenTwoNodes(newNode, head, newSpace);
+		reInitHead(newNode);
+		newSpace -> next = NULL;
 		
 	} else {
 		//add stuff in between 2 nodes
 		Node* newNode = makeNewNode(size, space -> startAddress, ALLOC);
 		insertInBetweenTwoNodes(newNode, space -> prev, space);
+		head -> startAddress = heap;
 	}
 
 	/*
@@ -122,7 +132,16 @@ Node* insert(size_t size){
 			new node -> prev -> next = new node
 	*/
 }
-
+void printNodeList(){
+	Node* node = head;
+	while(node){
+		printf("%zu\n", node -> size);
+		printf("%d\n", node -> type);
+		printf("%p\n", node -> startAddress);
+		printf("\n\n");
+		node = node -> next;
+	}
+}
 void* replacementAlloc(size_t size){
 	if(!heap){
 		initHeap();
@@ -133,6 +152,7 @@ void* replacementAlloc(size_t size){
 	if(!newNode){
 		return NULL;
 	}
+	printNodeList();
 
 	return newNode -> startAddress;
 
@@ -158,14 +178,14 @@ void mergeNodes(Node* nodeLeft, Node* nodeRight){
 	nodeRight -> next -> prev = nodeLeft;
 	nodeLeft -> next = nodeRight -> next;
 	free(nodeRight);
-	
-
 }
 
 
 void replacementFree(void* address){
+	printf("HERE\n");
 	Node* node = findNode(address);
 	if(node){
+		printf("INSIDE\n");
 		if(node -> next){
 			if(node -> next -> type == HOLE){
 				mergeNodes(node, node -> next);
@@ -180,7 +200,8 @@ void replacementFree(void* address){
 			free(node);
 		}
 	} else {
-		//crash
+		printf("INSIDE ELSE\n");
+		exit(EXIT_FAILURE);
 	}
 }
 

@@ -1,4 +1,4 @@
-#define USE_REPLACEMENT_MANAGER 0
+#define USE_REPLACEMENT_MANAGER 1
 
 #include <stdio.h>
 
@@ -6,7 +6,7 @@
 //load your memManager
 	#include "replacementMalloc.h"
 	#undef malloc
-	#define malloc myMalloc
+//	#define malloc myMalloc
 	
 	#undef free
 	#define free myFree
@@ -15,5 +15,9 @@
 #endif
 
 int main(int argc, char* argv[]){
-	char* ptr1 = malloc(300);
+	char* ptr1 = myMalloc(300);
+	char* ptr2 = myMalloc(400);
+	char* ptr3 = myMalloc(300);
+	char* ptr4 = myMalloc(100);
+	free(ptr4);
 }
