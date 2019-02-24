@@ -136,9 +136,24 @@ void* replacementAlloc(size_t size){
 
 
 }
+Node* findNode(void* address){
+	Node* node = head;
+	int notFound = 1;
+	while(notFound && node){
+		if(node -> startAddress == address){
+			notFound = 0;
+		} 
+		else {
+			node = node -> next;
+		}
+	}
+	return node;
+}
+
 
 void replacementFree(void* address){
-
+	Node* node = findNode(address);
+	
 }
 
 
