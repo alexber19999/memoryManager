@@ -164,13 +164,16 @@ void mergeNodes(Node* nodeLeft, Node* nodeRight){
 void replacementFree(void* address){
 	Node* node = findNode(address);
 	if(node){
-		if(node -> next -> type == HOLE){
-			mergeNodes(node, node -> next);
+		if(node -> next){
+			if(node -> next -> type == HOLE){
+				mergeNodes(node, node -> next);
+			}
 		}
-		if(node -> prev -> type == HOLE){
-			mergeNodes(node -> prev, node);
+		if(node -> prev != head){
+			if(node -> prev -> type == HOLE){
+				mergeNodes(node -> prev, node);
+			}
 		}
-	
 		if(node){
 			free(node);
 		}
